@@ -42,8 +42,8 @@ function AIToolsStats() {
         setStats({
           documents_processed: 2847,
           land_cover_maps: 456,
-          avg_processing_time: 2.3,
-          success_rate: 98.5
+          avg_processing_time: 5.3,
+          success_rate: 98.4
         })
       } catch (error) {
         console.error("Failed to fetch AI tools stats:", error)

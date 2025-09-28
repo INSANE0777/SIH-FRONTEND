@@ -52,6 +52,7 @@ export function GovernmentHeader() {
               </div>
             </div>
 
+            {/* Desktop Menu */}
             <nav className="hidden lg:flex items-center gap-6">
               <a
                 href="/"
@@ -79,7 +80,7 @@ export function GovernmentHeader() {
                 className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-all duration-200 hover:scale-105"
               >
                 <FileText className="h-4 w-4" />
-                {t("claims")}
+                Data Explorer
               </a>
               <a
                 href="/ai-tools"
@@ -93,18 +94,15 @@ export function GovernmentHeader() {
                 className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-all duration-200 hover:scale-105"
               >
                 <Users className="h-4 w-4" />
-                {t("villageProfile")}
+                DSS Engine
               </a>
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* The LanguageToggle is now used directly, assuming the text-white class was removed inside it */}
             <LanguageToggle />
 
-            <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
-              v2.0
-            </Badge>
+           
 
             <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -112,15 +110,34 @@ export function GovernmentHeader() {
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t animate-slide-up">
             <nav className="flex flex-col gap-3 pt-4">
-              <a href="/" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2"><Home className="h-4 w-4" />{t("home")}</a>
-              <a href="/dashboard" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2"><BarChart3 className="h-4 w-4" />{t("dashboard")}</a>
-              <a href="/map" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2"><Map className="h-4 w-4" />{t("map")}</a>
-              <a href="/claims" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2"><FileText className="h-4 w-4" />{t("claims")}</a>
-              <a href="/ai-tools" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2"><Brain className="h-4 w-4" />{t("aiTools")}</a>
-              <a href="/village-profile" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2"><Users className="h-4 w-4" />{t("villageProfile")}</a>
+              <a href="/" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2">
+                <Home className="h-4 w-4" />
+                {t("home")}
+              </a>
+              <a href="/dashboard" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2">
+                <BarChart3 className="h-4 w-4" />
+                {t("dashboard")}
+              </a>
+              <a href="/map" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2">
+                <Map className="h-4 w-4" />
+                {t("map")}
+              </a>
+              <a href="/claims" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2">
+                <FileText className="h-4 w-4" />
+                Data Explorer
+              </a>
+              <a href="/ai-tools" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2">
+                <Brain className="h-4 w-4" />
+                {t("aiTools")}
+              </a>
+              <a href="/village-profile" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors py-2">
+                <Users className="h-4 w-4" />
+                DSS Engine
+              </a>
             </nav>
           </div>
         )}

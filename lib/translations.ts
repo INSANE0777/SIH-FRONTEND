@@ -1,8 +1,8 @@
 export const translations = {
   en: {
     // Header
-    siteTitle: "BHUमि",
-    siteSubtitle: "Forest Rights Management Portal",
+    siteTitle: "BHOOMI",
+    siteSubtitle: "Forest RightS Portal",
     ministry: "MINISTRY OF TRIBAL AFFAIRS",
     govOfIndia: "GOVERNMENT OF INDIA",
 
@@ -16,7 +16,7 @@ export const translations = {
 
     // Landing Page Hero
     heroTitle: "Forest Rights",
-    heroSubtitle: "Management Portal",
+    heroSubtitle: "Manager Portal",
     heroDescription:
       "Comprehensive Decision Support System for FRA claim management, spatial analysis, and AI-powered document processing",
     accessDashboard: "Access Dashboard",
@@ -63,6 +63,7 @@ export const translations = {
       "To ensure land tenure, livelihood and food security of the forest dwelling Scheduled Tribes and other traditional forest dwellers",
     objective3:
       "To strengthen the conservation regime of the forests by including the responsibilities and authority on Forest Rights holders for sustainable use, conservation of biodiversity and maintenance of ecological balance.",
+      actYear: "Act Year",
 
     // Dashboard
     fra: "FRA",

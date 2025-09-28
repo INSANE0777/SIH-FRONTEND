@@ -34,22 +34,21 @@ export default function HomePage() {
       <GovernmentHeader />
 
       <main className="flex-1">
+        {/* Hero Section */}
         <section className="relative overflow-hidden min-h-screen flex items-center">
-          {/* Shader gradient background similar to DBIM Toolkit */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-secondary/10 to-accent/20"></div>
-            <div className="absolute inset-0 gradient-animation opacity-30"></div>
-            {/* Animated geometric patterns */}
-            <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute bottom-40 right-32 w-48 h-48 bg-primary/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
-            <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/10 rounded-full blur-lg animate-pulse delay-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900">
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-secondary/5 to-accent/10"></div>
+            {/* Static, subtle background elements */}
+            <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-40 right-32 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-secondary/10 rounded-full blur-xl"></div>
           </div>
 
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-6xl mx-auto">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-8 animate-fade-in">
-                  <Badge variant="secondary" className="mb-4 animate-scale-in bg-white/10 text-white border-white/20">
+                  <Badge variant="secondary" className="mb-4 bg-white/10 text-white border-white/20">
                     <Sparkles className="h-3 w-3 mr-1" />
                     {t("governmentInitiative")}
                   </Badge>
@@ -65,7 +64,7 @@ export default function HomePage() {
                   <div className="flex flex-col sm:flex-row gap-6 pt-6 animate-slide-up">
                     <Button
                       size="lg"
-                      className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-4 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+                      className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                       asChild
                     >
                       <a href="/dashboard" className="flex items-center gap-2">
@@ -85,34 +84,30 @@ export default function HomePage() {
                   </div>
                 </div>
 
+                {/* Refined and grounded UI Mockup */}
                 <div className="relative animate-fade-in">
-                  <div className="relative z-10">
-                    {/* Main dashboard mockup */}
-                    <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20 animate-float">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                        <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="h-4 bg-white/20 rounded w-3/4"></div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div className="h-16 bg-primary/30 rounded"></div>
-                          <div className="h-16 bg-secondary/30 rounded"></div>
-                          <div className="h-16 bg-accent/30 rounded"></div>
+                  <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="h-4 bg-white/20 rounded w-1/2"></div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Simplified Bar Chart */}
+                        <div className="h-24 bg-primary/20 rounded-lg p-2 flex items-end gap-1 border border-white/10">
+                            <div className="w-1/4 h-1/3 bg-primary/50 rounded-sm"></div>
+                            <div className="w-1/4 h-2/3 bg-primary/50 rounded-sm"></div>
+                            <div className="w-1/4 h-1/2 bg-primary/50 rounded-sm"></div>
+                            <div className="w-1/4 h-3/4 bg-primary/50 rounded-sm"></div>
                         </div>
-                        <div className="h-24 bg-white/10 rounded"></div>
+                        {/* Simplified Map */}
+                        <div className="h-24 bg-secondary/20 rounded-lg flex items-center justify-center border border-white/10">
+                          <Globe className="h-12 w-12 text-secondary/50" />
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Floating mobile mockup */}
-                    <div className="absolute -top-8 -right-8 bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-xl border border-white/20 animate-float-delayed">
-                      <div className="w-16 h-24 bg-white/20 rounded-lg"></div>
-                    </div>
-
-                    {/* Floating tablet mockup */}
-                    <div className="absolute -bottom-6 -left-6 bg-white/10 backdrop-blur-lg rounded-xl p-3 shadow-xl border border-white/20 animate-float-slow">
-                      <div className="w-20 h-16 bg-white/20 rounded"></div>
+                      <div className="h-8 bg-white/10 rounded-lg"></div>
                     </div>
                   </div>
                 </div>
@@ -121,6 +116,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Key Features Section */}
         <section className="py-32 bg-background relative">
           <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/20"></div>
           <div className="container mx-auto px-4 relative">
@@ -179,6 +175,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* About FRA Section */}
         <section className="py-32 bg-gradient-to-r from-primary/5 to-secondary/5 relative">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
@@ -224,17 +221,17 @@ export default function HomePage() {
                       </div>
                       <div>
                         <h4 className="font-bold text-foreground">2006</h4>
-                        <p className="text-sm text-muted-foreground">अधिनियम वर्ष</p>
+                        <p className="text-sm text-muted-foreground">{t("actYear")}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-4 bg-primary/5 rounded-xl">
                         <div className="text-2xl font-bold text-primary">15,000+</div>
-                        <div className="text-sm text-muted-foreground">कुल दावे</div>
+                        <div className="text-sm text-muted-foreground">{t("totalClaims")}</div>
                       </div>
                       <div className="text-center p-4 bg-secondary/5 rounded-xl">
                         <div className="text-2xl font-bold text-secondary">65.7%</div>
-                        <div className="text-sm text-muted-foreground">अनुमोदन दर</div>
+                        <div className="text-sm text-muted-foreground">{t("approvalRate")}</div>
                       </div>
                     </div>
                   </div>
@@ -244,6 +241,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Achievements Section */}
         <section className="py-32 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
@@ -290,11 +288,11 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10"></div>
-          <div className="absolute inset-0 gradient-animation opacity-5"></div>
           <div className="container mx-auto px-4 relative">
-            <Card className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border-primary/20 shadow-2xl animate-fade-in max-w-5xl mx-auto">
+            <Card className="relative overflow-hidden bg-white border-primary/20 shadow-2xl animate-fade-in max-w-5xl mx-auto">
               <CardContent className="p-16 text-center relative">
                 <div className="flex justify-center mb-8">
                   <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-2xl">
@@ -308,7 +306,7 @@ export default function HomePage() {
                 <div className="flex flex-col sm:flex-row gap-6 justify-center">
                   <Button
                     size="lg"
-                    className="bg-primary hover:bg-primary/90 text-lg px-10 py-6 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+                    className="bg-primary hover:bg-primary/90 text-lg px-10 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     asChild
                   >
                     <a href="/dashboard" className="flex items-center gap-3">
@@ -320,7 +318,7 @@ export default function HomePage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="text-lg px-10 py-6 hover:bg-primary/5 transition-all duration-300 hover:scale-105 bg-transparent border-2"
+                    className="text-lg px-10 py-6 hover:bg-primary/5 transition-all duration-300 hover:scale-105 border-2"
                   >
                     <FileText className="h-6 w-6 mr-3" />
                     {t("viewUserGuide")}

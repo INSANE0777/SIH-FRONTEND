@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,8 +6,21 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Upload, Satellite, CheckCircle, Download, BarChart3, AlertCircle, Image as ImageIcon } from "lucide-react"
+import {
+  Upload,
+  Satellite,
+  CheckCircle,
+  Download,
+  BarChart3,
+  AlertCircle,
+  ImageIcon,
+  MapPin,
+  Lightbulb,
+  Target,
+  Loader2
+} from "lucide-react"
 
+// Types
 interface LandCoverStats {
   [key: string]: string
 }
@@ -27,16 +38,32 @@ interface LandCoverResult {
   }
 }
 
+interface DSSRecommendation {
+  scheme_name: string
+  objective: string
+  rationale: string
+}
+
+interface VillageDSSResult {
+  recommendations: DSSRecommendation[]
+}
+
 // API Configuration
 const API_BASE_URL = "http://localhost:8000/api/v1"
+const DSS_API_URL = "http://localhost:8004"
 
 export function LandCoverAnalysis() {
+  // Land Cover Analysis State
   const [files, setFiles] = useState<File[]>([])
   const [processing, setProcessing] = useState(false)
   const [results, setResults] = useState<LandCoverResult[]>([])
   const [dragActive, setDragActive] = useState(false)
   const [currentProgress, setCurrentProgress] = useState(0)
   const [selectedMask, setSelectedMask] = useState<string | null>(null)
+
+  // DSS State
+  const [dssResults, setDssResults] = useState<VillageDSSResult | null>(null)
+  const [dssLoading, setDssLoading] = useState(false)
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -80,10 +107,10 @@ export function LandCoverAnalysis() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
       const startTime = Date.now()
-      
+
       try {
         setCurrentProgress(((i + 0.5) / files.length) * 100)
-        
+
         const formData = new FormData()
         formData.append("file", file)
 
@@ -126,7 +153,7 @@ export function LandCoverAnalysis() {
           error: error instanceof Error ? error.message : "Network error occurred"
         })
       }
-      
+
       setCurrentProgress(((i + 1) / files.length) * 100)
     }
 
@@ -135,20 +162,63 @@ export function LandCoverAnalysis() {
     setCurrentProgress(0)
   }
 
+  const getDevelopmentRecommendations = async (landCoverStats: LandCoverStats, resultIndex: number) => {
+    setDssLoading(true)
+
+    try {
+      console.log('Sending land cover stats to DSS API:', landCoverStats)
+
+      const response = await fetch(`${DSS_API_URL}/api/v1/dss/recommend_development_schemes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          land_cover_statistics: landCoverStats,
+          village_name: "Analysis Area"
+        })
+      })
+
+      console.log('DSS API Response status:', response.status)
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('DSS API Response:', result)
+        setDssResults(result)
+      } else {
+        const errorText = await response.text()
+        console.error("DSS API Error:", response.status, errorText)
+        alert(`Failed to get development recommendations. API Error: ${response.status} - ${errorText}`)
+      }
+    } catch (error) {
+      console.error("DSS Request Error:", error)
+      alert(`Failed to connect to DSS API: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setDssLoading(false)
+    }
+  }
+
   const clearAll = () => {
     setFiles([])
     setResults([])
     setCurrentProgress(0)
     setSelectedMask(null)
+    setDssResults(null)
   }
 
   const downloadResults = () => {
-    const dataStr = JSON.stringify(results.map(r => ({
-      filename: r.filename,
-      land_cover_statistics: r.land_cover_statistics,
-      processing_time: r.processing_time,
-      success: r.success
-    })), null, 2)
+    const exportData = {
+      landCoverResults: results.map(r => ({
+        filename: r.filename,
+        land_cover_statistics: r.land_cover_statistics,
+        processing_time: r.processing_time,
+        success: r.success
+      })),
+      villageDevelopmentRecommendations: dssResults,
+      timestamp: new Date().toISOString()
+    }
+
+    const dataStr = JSON.stringify(exportData, null, 2)
     const dataBlob = new Blob([dataStr], { type: 'application/json' })
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement('a')
@@ -160,7 +230,7 @@ export function LandCoverAnalysis() {
 
   const downloadMask = (result: LandCoverResult) => {
     if (!result.segmentation_mask_base64) return
-    
+
     const link = document.createElement('a')
     link.href = `data:image/png;base64,${result.segmentation_mask_base64}`
     link.download = `${result.filename.split('.')[0]}_segmentation_mask.png`
@@ -169,17 +239,21 @@ export function LandCoverAnalysis() {
 
   const getLandCoverColor = (category: string) => {
     const categoryLower = category.toLowerCase()
-    if (categoryLower.includes("forest")) return "bg-green-100 text-green-800 border-green-200"
-    if (categoryLower.includes("agricultural") || categoryLower.includes("agriculture")) return "bg-yellow-100 text-yellow-800 border-yellow-200"
-    if (categoryLower.includes("water")) return "bg-blue-100 text-blue-800 border-blue-200"
-    if (categoryLower.includes("built") || categoryLower.includes("urban")) return "bg-gray-100 text-gray-800 border-gray-200"
-    if (categoryLower.includes("barren") || categoryLower.includes("bare")) return "bg-orange-100 text-orange-800 border-orange-200"
-    if (categoryLower.includes("vegetation")) return "bg-emerald-100 text-emerald-800 border-emerald-200"
+    if (categoryLower.includes("forest") || categoryLower.includes("vegetation")) return "bg-green-100 text-green-800 border-green-200"
+    if (categoryLower.includes("agricultural") || categoryLower.includes("open")) return "bg-yellow-100 text-yellow-800 border-yellow-200"
+    // FIX: Made the check more specific to correctly identify "Water Bodies"
+    if (categoryLower.includes("water") || categoryLower.includes("bodies")) return "bg-blue-100 text-blue-800 border-blue-200"
+    if (categoryLower.includes("homestead") || categoryLower.includes("built") || categoryLower.includes("urban")) return "bg-gray-100 text-gray-800 border-gray-200"
     return "bg-purple-100 text-purple-800 border-purple-200"
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto p-6">
+      <div className="text-center space-y-2 mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Land Cover Analysis & Decision Support System</h1>
+        <p className="text-gray-600">Advanced satellite imagery analysis with AI-powered development recommendations</p>
+      </div>
+
       {/* Upload Area */}
       <Card>
         <CardHeader>
@@ -188,7 +262,7 @@ export function LandCoverAnalysis() {
             Satellite Image Upload & Analysis
           </CardTitle>
           <CardDescription>
-            Upload satellite imagery for advanced land cover classification using U-Net deep learning models with enhanced water body detection
+            Upload satellite imagery for advanced land cover classification using U-Net deep learning models
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -237,7 +311,7 @@ export function LandCoverAnalysis() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {files.map((file, index) => (
                   <div key={index} className="relative group">
@@ -279,7 +353,7 @@ export function LandCoverAnalysis() {
         </CardContent>
       </Card>
 
-      {/* Results */}
+      {/* Land Cover Results */}
       {results.length > 0 && (
         <Card>
           <CardHeader>
@@ -295,7 +369,7 @@ export function LandCoverAnalysis() {
               </div>
               <Button onClick={downloadResults} variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
-                Export Results
+                Export Complete Analysis
               </Button>
             </div>
           </CardHeader>
@@ -333,7 +407,7 @@ export function LandCoverAnalysis() {
                 {result.success && Object.keys(result.land_cover_statistics).length > 0 && (
                   <>
                     <Separator />
-                    
+
                     {/* Land Cover Statistics */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
@@ -350,18 +424,40 @@ export function LandCoverAnalysis() {
                           </div>
                         ))}
                       </div>
+
+                      {/* Development Recommendations Button */}
+                      <div className="pt-2">
+                        <Button
+                          onClick={() => getDevelopmentRecommendations(result.land_cover_statistics, index)}
+                          disabled={dssLoading}
+                          className="w-full"
+                          type="button"
+                        >
+                          {dssLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Getting Recommendations...
+                            </>
+                          ) : (
+                            <>
+                              <Lightbulb className="h-4 w-4 mr-2" />
+                              Get Development Recommendations
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Segmentation Preview */}
                     {result.segmentation_mask_base64 && (
                       <div className="space-y-2">
                         <h4 className="font-medium text-sm">Segmentation Mask</h4>
-                        <div 
+                        <div
                           className="p-4 bg-muted/30 rounded border-2 border-dashed cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => setSelectedMask(result.segmentation_mask_base64)}
                         >
                           <div className="flex items-center justify-center">
-                            <img 
+                            <img
                               src={`data:image/png;base64,${result.segmentation_mask_base64}`}
                               alt="Segmentation mask"
                               className="max-h-32 rounded border"
@@ -382,8 +478,8 @@ export function LandCoverAnalysis() {
                   </span>
                   <div className="flex gap-2">
                     {result.segmentation_mask_base64 && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => downloadMask(result)}
                       >
@@ -391,10 +487,6 @@ export function LandCoverAnalysis() {
                         Download Mask
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export Data
-                    </Button>
                   </div>
                 </div>
               </div>
@@ -403,9 +495,44 @@ export function LandCoverAnalysis() {
         </Card>
       )}
 
+      {/* Village Development Recommendations */}
+      {dssResults && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-blue-600" />
+              Development Recommendations
+            </CardTitle>
+            <CardDescription>
+              AI-powered development schemes based on land cover analysis
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              {dssResults.recommendations.map((rec, index) => (
+                <div key={index} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-blue-100 p-2 rounded-full">
+                      <Target className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-lg">{rec.scheme_name}</h4>
+                      <p className="text-sm text-muted-foreground mb-2">{rec.objective}</p>
+                      <div className="bg-muted/50 p-3 rounded">
+                        <p className="text-sm">{rec.rationale}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Full Size Mask Modal */}
       {selectedMask && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedMask(null)}
         >
@@ -416,7 +543,7 @@ export function LandCoverAnalysis() {
                 Close
               </Button>
             </div>
-            <img 
+            <img
               src={`data:image/png;base64,${selectedMask}`}
               alt="Full size segmentation mask"
               className="w-full h-auto rounded border"
@@ -427,4 +554,3 @@ export function LandCoverAnalysis() {
     </div>
   )
 }
-                        

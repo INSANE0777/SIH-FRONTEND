@@ -5,37 +5,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { VillageSearch } from "@/components/village-profile/village-search"
 import { VillageDetails } from "@/components/village-profile/village-details"
-import { SchemeRecommendations } from "@/components/village-profile/scheme-recommendations"
+import { ClaimSelector } from "@/components/village-profile/claim-selector"
+import { ClaimRecommendations } from "@/components/village-profile/claim-recommendations"
 import { InterventionPriority } from "@/components/village-profile/intervention-priority"
 import { DSSStats } from "@/components/village-profile/dss-stats"
 import { MapPin, Users, Award, TrendingUp } from "lucide-react"
 
+// Defines the structure of a Village object used across components
 export interface Village {
   village_name: string
   district: string
   state: string
+  // These fields are part of the mock data for the search component
   population: number
   households: number
   literacy_rate: number
-  infrastructure_score: number
   fra_claims_count: number
   approved_claims: number
-  coordinates: [number, number]
 }
 
 export function VillageProfileInterface() {
   const [selectedVillage, setSelectedVillage] = useState<Village | null>(null)
+  const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("profile")
+
+  // This function is called when a village is selected from the search results
+  const handleVillageSelect = (village: Village) => {
+    setSelectedVillage(village)
+    setSelectedClaimId(null) // Reset claim selection when village changes
+    setActiveTab("profile")   // Always switch back to the profile tab
+  }
 
   return (
     <div className="space-y-6">
-      {/* DSS Statistics */}
       <DSSStats />
+      <VillageSearch onVillageSelect={handleVillageSelect} />
 
-      {/* Village Search */}
-      <VillageSearch onVillageSelect={setSelectedVillage} />
-
-      {/* Main Interface */}
       {selectedVillage ? (
         <Card>
           <CardHeader>
@@ -46,8 +51,7 @@ export function VillageProfileInterface() {
               <div>
                 <CardTitle className="text-xl">{selectedVillage.village_name}</CardTitle>
                 <CardDescription>
-                  {selectedVillage.district}, {selectedVillage.state} • Population:{" "}
-                  {selectedVillage.population.toLocaleString()}
+                  {selectedVillage.district}, {selectedVillage.state}
                 </CardDescription>
               </div>
             </div>
@@ -59,13 +63,13 @@ export function VillageProfileInterface() {
                   <Users className="h-4 w-4" />
                   Village Profile
                 </TabsTrigger>
-                <TabsTrigger value="schemes" className="flex items-center gap-2">
+                <TabsTrigger value="recommendations" className="flex items-center gap-2">
                   <Award className="h-4 w-4" />
-                  Scheme Recommendations
+                  Claim Recommendations
                 </TabsTrigger>
                 <TabsTrigger value="interventions" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Intervention Priority
+                  State Interventions
                 </TabsTrigger>
               </TabsList>
 
@@ -73,8 +77,13 @@ export function VillageProfileInterface() {
                 <VillageDetails village={selectedVillage} />
               </TabsContent>
 
-              <TabsContent value="schemes" className="mt-6">
-                <SchemeRecommendations village={selectedVillage} />
+              <TabsContent value="recommendations" className="mt-6 space-y-6">
+                <ClaimSelector village={selectedVillage} onClaimSelect={setSelectedClaimId} selectedClaimId={selectedClaimId} />
+                {selectedClaimId ? (
+                  <ClaimRecommendations claimId={selectedClaimId} />
+                ) : (
+                  <p className="text-center text-muted-foreground pt-4">Please select a claim to see recommendations.</p>
+                )}
               </TabsContent>
 
               <TabsContent value="interventions" className="mt-6">
@@ -91,7 +100,7 @@ export function VillageProfileInterface() {
               <div>
                 <h3 className="text-lg font-medium text-foreground">Select a Village</h3>
                 <p className="text-muted-foreground">
-                  Search and select a village to view comprehensive profile and recommendations
+                  Search and select a village to view its profile and get recommendations.
                 </p>
               </div>
             </div>
